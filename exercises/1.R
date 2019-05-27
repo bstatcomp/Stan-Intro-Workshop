@@ -1,4 +1,5 @@
 # libraries
+library(ggplot2)
 library(dplyr)
 library(rstan)
 library(mcmcse)
@@ -6,7 +7,7 @@ library(mcmcse)
 
 ## preparation ----------------------------------------------------------------
 # load data
-data <- readRDS("data/basketball_shots.rds")
+data <- read.csv("data/basketball_shots.csv", sep=";")
 
 # compile the model
 model <- stan_model("bernoulli.stan")

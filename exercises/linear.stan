@@ -11,6 +11,7 @@ parameters {
 }
 
 model {
-  for (i in 1:n)
+  for (i in 1:n) {
     y[i] ~ normal(a + b * x[i], sigma);
+  }
 }

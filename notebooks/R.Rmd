@@ -1,0 +1,57 @@
+---
+title: "Izjemno kratek uvod v R"
+date: "31/5/2019"
+author: "Jure Demsar"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    toc: yes
+    highlight: github
+---
+
+
+# R in RStudio
+
+R (https://www.r-project.org/) is odprto kodni programski jezik namenjen primarno statisičnim izračunom. Osnovni vmesnik za delo z Rjem je precej okoren, zato si delo lahko precej olajšamo z namestitvijo drugega razvojnega okolja. Najbolj razširjeno ter razmeroma kvalitetno razvojno okolje se imenuje RStudio (https://www.rstudio.com).
+
+# Paketi
+
+Ker je R odprto kodni programski jezik lahko vsak prispeva k njegovem razvoju s pomočjo dodatnih paketov. Uporaba paketov nam močno olajša delo, večina uporabnih paketov se nahaja v repozitoriju CRAN. V RStudiu lahko pakete iz repozitorija CRAN naložimo preko menuja Tools in izbire Install Packages. Če poznamo ime paketa, ki ga želimo namestiti lahko to naredimo tudi nreposredno preko ukazne vrstice, ukaz `install.packages("dplyr")` namesti paket dplyr. Ko paket namestimo, ga moramo pred uporabno še uvoziti v našo skripto, to storimo s pomočjo ukaza `library()`. Spodnja koda namesti ter uvozi vse pakete, ki jih bomo potrebovali pri reševanju današnjih nalog.
+
+```{r eval = FALSE}
+# install packages
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("mcmcse")
+install.packages("rstan")
+
+# load packages into workspace
+library(dplyr)
+library(ggplot2)
+library(mcmcse)
+library(rstan)
+
+```
+
+
+# Nalaganje podatkov
+
+Podatki so običajno shranjeni v obliki .csv (angl. *comma separated value*) datotek. Vsaka vrstica v datoteki predstavlja eno meritev, v vsaki vrstici lahko najdemo več atributov te meritve, atributi so ločeni s posebnim znakom, ki v vrednostih atributov ne nastopa. V R podatke iz datoteke csv naložimo s pomočjo ukaza `read.csv()`. Privzeti znak za ločevanje atributov je vejica, zaradi praktičnih razlogov (zmeda z decimalno vejico/piko, nastopanje vejice v tekstovnih podatkih) se vejica običajno ne uporablja. Delilni znak (angl. *separator*) lahko nastavimo z uporabo parametra `par`. Spodnja koda v spremenljivko `basket_data` naloži podatke iz datoteke `basketball_shots.csv`, ki se nahaja v direktoriju `data`.
+
+```{r eval = FALSE}
+# load data
+basket_data <- read.csv("data/basketball_shots.csv", sep=";")
+
+```
+
+Podatki se naložijo v tako imenovam podatkovni okvir (angl. *data frame*), ta podatkovni tip si lahko predstavljate kot tabelo, kjer stolpci predstavljajo atribute, vrstice pa primerke/meritve. Tako se v posameznih celicah nahajajo vrednosti atributa za določen primerek.
+
+
+# Manipulacije nad podatki
+
+filter, select, arrange, summarize, mutate
+
+
+
+# Cev (angl. pipe)
+
