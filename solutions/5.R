@@ -7,10 +7,11 @@ library(reshape2)
 
 
 ## preparation ----------------------------------------------------------------
-# !!!!! load the data !!!!!
-data <- !!!!!
+# load data
+data <- read.csv("../data/elections.csv", sep=";")
 
-# !!!!! compile the model !!!!!
+# compile the model
+model <- stan_model("elections.stan")
 
 
 ## expand the votes variable --------------------------------------------------
@@ -19,9 +20,15 @@ votes <- model.matrix(~ vote - 1, data=votes)
 
 
 ## fit ------------------------------------------------------------------------
-# !!!!! prepare data for Stan !!!!!
+# prepare data for Stan
+n <- nrow(data)
+Y <- votes
+k <- ncol(Y)
+stan_data <- list(n = n,
+                  k = k,
+                  Y = Y)
 
-# fit
+#fit
 fit <- sampling(model, data = stan_data,
                 chains = 1, iter = 2000, warmup = 1000)
 
@@ -38,7 +45,17 @@ colnames(df_thetas) <- substring(colnames(votes), 5)
 
 
 ## analysis -------------------------------------------------------------------
-# !!!!! calculate 95% CIs for all parties, or for the ones you are interested in !!!!!
+# CIs for all parties
+quantile(df_thetas$DeSUS, probs = c(0.025, 0.975))
+quantile(df_thetas$Levica, probs = c(0.025, 0.975))
+quantile(df_thetas$LMS, probs = c(0.025, 0.975))
+quantile(df_thetas$NSi, probs = c(0.025, 0.975))
+quantile(df_thetas$SAB, probs = c(0.025, 0.975))
+quantile(df_thetas$SD, probs = c(0.025, 0.975))
+quantile(df_thetas$SDS, probs = c(0.025, 0.975))
+quantile(df_thetas$SLS, probs = c(0.025, 0.975))
+quantile(df_thetas$SMC, probs = c(0.025, 0.975))
+quantile(df_thetas$SNS, probs = c(0.025, 0.975))
 
 # densities plot
 df_densities <- melt(df_thetas)
@@ -48,13 +65,13 @@ ggplot(data=df_densities, aes(x=value)) +
   xlab("percentage") +
   xlim(0, 0.5)
 
-# current state in the parliament
+# current parliament
 df_current <- NULL
 chairs <- c(5, 9, 13, 7, 5, 10, 25, 0, 10, 4)
 df_current <- rbind(df_current, chairs)
 colnames(df_current) <- colnames(df_thetas)
 
-# transform vote predictions into chair predictions
+# chair predictions
 df_cp <- NULL
 df_more <- NULL
 for (i in 1:nrow(df_thetas)) {
@@ -70,7 +87,7 @@ for (i in 1:nrow(df_thetas)) {
   # attach row to data frame
   df_cp <- rbind(df_cp, row)
   
-  # more chairs than previously?
+  # more chairs?
   more <- row >= df_current
   # attach row to data frame
   df_more <- rbind(df_more, more)
@@ -87,6 +104,8 @@ ggplot(data=df_chairs, aes(x=value)) +
 # probability of more chairs than currently
 colSums(df_more) / nrow(df_more)
 
-# !!!!! probability of SDS, SLS, NSi and SNS coalition (more than 44 chairs) !!!!!
+# probability of SDS, SLS, NSi and SNS coalition (more than 44 chairs)
+mcse(df_cp$SDS + df_cp$SLS + df_cp$NSi + df_cp$SNS > 44)
 
-# !!!!! probability of LMS, SAB, SD, DeSUS and SMC coalition (more than 44 chairs) !!!!!
+# probability of LMS, SAB, SD, DeSUS and SMC coalition (more than 44 chairs)
+mcse(df_cp$LMS + df_cp$SAB + df_cp$SD + df_cp$DeSUS + df_cp$SMC > 44)

@@ -136,24 +136,58 @@ code > span.ot { color: #007020; }
 <a class="sourceLine" id="cb1-2" title="2"><span class="kw">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</a>
 <a class="sourceLine" id="cb1-3" title="3"><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
 <a class="sourceLine" id="cb1-4" title="4"><span class="kw">install.packages</span>(<span class="st">&quot;mcmcse&quot;</span>)</a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="kw">install.packages</span>(<span class="st">&quot;rstan&quot;</span>)</a>
-<a class="sourceLine" id="cb1-6" title="6"></a>
-<a class="sourceLine" id="cb1-7" title="7"><span class="co"># load packages into workspace</span></a>
-<a class="sourceLine" id="cb1-8" title="8"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb1-9" title="9"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb1-10" title="10"><span class="kw">library</span>(mcmcse)</a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="kw">library</span>(rstan)</a></code></pre></div>
+<a class="sourceLine" id="cb1-5" title="5"><span class="kw">install.packages</span>(<span class="st">&quot;reshape2&quot;</span>)</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="kw">install.packages</span>(<span class="st">&quot;rstan&quot;</span>)</a>
+<a class="sourceLine" id="cb1-7" title="7"></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="co"># load packages into workspace</span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="kw">library</span>(mcmcse)</a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="kw">library</span>(rstan)</a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="kw">library</span>(reshape2)</a></code></pre></div>
 </div>
 <div id="nalaganje-podatkov" class="section level1">
 <h1>Nalaganje podatkov</h1>
 <p>Podatki so običajno shranjeni v obliki .csv (angl. <em>comma separated value</em>) datotek. Vsaka vrstica v datoteki predstavlja eno meritev, v vsaki vrstici lahko najdemo več atributov te meritve, atributi so ločeni s posebnim znakom, ki v vrednostih atributov ne nastopa. V R podatke iz datoteke csv naložimo s pomočjo ukaza <code>read.csv()</code>. Privzeti znak za ločevanje atributov je vejica, zaradi praktičnih razlogov (zmeda z decimalno vejico/piko, nastopanje vejice v tekstovnih podatkih) se vejica običajno ne uporablja. Delilni znak (angl. <em>separator</em>) lahko nastavimo z uporabo parametra <code>par</code>. Spodnja koda v spremenljivko <code>basket_data</code> naloži podatke iz datoteke <code>basketball_shots.csv</code>, ki se nahaja v direktoriju <code>data</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># load data</span></a>
-<a class="sourceLine" id="cb2-2" title="2">basket_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/basketball_shots.csv&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;;&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" title="2">basket_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;../data/basketball_shots.csv&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;;&quot;</span>)</a></code></pre></div>
 <p>Podatki se naložijo v tako imenovam podatkovni okvir (angl. <em>data frame</em>), ta podatkovni tip si lahko predstavljate kot tabelo, kjer stolpci predstavljajo atribute, vrstice pa primerke/meritve. Tako se v posameznih celicah nahajajo vrednosti atributa za določen primerek.</p>
 </div>
 <div id="manipulacije-nad-podatki" class="section level1">
 <h1>Manipulacije nad podatki</h1>
-<p>filter, select, arrange, summarize, mutate</p>
+<p>Za potrebe delavnice bomo spoznali zgolj najbolj osnovne operacije za delo s podatki. Urejanje podatkov si bomo olajšali z uporabo knjižnice <code>dplyr</code>. V naših podatkih o metih na koš nastopa več igralcev, vsak izmed njih je 60 krat vrgel na obilčajen koš ter 60 krat na koš z manjšim obsegom obroča. Spodnji primer prikazuje, kako iz vseh podatkov izluščimo samo podatke o metih prvega igralca na običajen obroč.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># load data</span></a>
+<a class="sourceLine" id="cb3-2" title="2">player1_data &lt;-<span class="st"> </span><span class="kw">filter</span>(basket_data, PlayerID <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>SpecialRim <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</a></code></pre></div>
+<p>Za vsak met imamo 5 podatkov: * ID igralca (<em>PlayerID</em>), * ID meta (<em>ThrowNum</em>), * kot izmeta (<em>Angle</em>), * uspešnost (<em>Made</em>), * tip obroča (<em>SpecialRim</em>).</p>
+<p>Recimo, da za nadaljno analizo potrebujemo zgolj stolpca s podatki o zaporedni številki meta ter o uspešnosti meta, ostalih stolpec se lahko znebimo z uporabo operacije <code>select</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># load data</span></a>
+<a class="sourceLine" id="cb4-2" title="2">player1_data &lt;-<span class="st"> </span><span class="kw">select</span>(player1_data, ThrowNum, Made)</a></code></pre></div>
+<p>Operacijo <code>melt</code> iz paketa <code>reshape2</code> bomo uporabljali predsem za pripravo podatkov pred vizualizacijami.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">melt_data &lt;-<span class="st"> </span><span class="kw">filter</span>(basket_data, PlayerID <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>ThrowNum <span class="op">&lt;=</span><span class="st"> </span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>SpecialRim <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-2" title="2">melt_data &lt;-<span class="st"> </span><span class="kw">select</span>(melt_data, PlayerID, ThrowNum, Made)</a></code></pre></div>
+<pre><code>##   PlayerID ThrowNum Made
+## 1        1        1    1
+## 2        1        2    1
+## 3        1        3    1
+## 4        1        4    0
+## 5        1        5    0</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">melt_data &lt;-<span class="st"> </span><span class="kw">melt</span>(melt_data)</a></code></pre></div>
+<pre><code>##    variable value
+## 1  PlayerID     1
+## 2  PlayerID     1
+## 3  PlayerID     1
+## 4  PlayerID     1
+## 5  PlayerID     1
+## 6  ThrowNum     1
+## 7  ThrowNum     2
+## 8  ThrowNum     3
+## 9  ThrowNum     4
+## 10 ThrowNum     5
+## 11     Made     1
+## 12     Made     1
+## 13     Made     1
+## 14     Made     0
+## 15     Made     0</code></pre>
 </div>
 <div id="cev-angl.-pipe" class="section level1">
 <h1>Cev (angl. pipe)</h1>

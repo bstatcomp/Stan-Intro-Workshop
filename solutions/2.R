@@ -6,21 +6,24 @@ library(mcmcse)
 
 
 ## preparation ----------------------------------------------------------------
-# !!!!! load the data !!!!!
+# load the data
+data <- read.csv("../data/temperature.csv", sep=";")
 
+# compile the model
+model <- stan_model("normal.stan")
 
-# !!!!! compile the model !!!!!
-
-
+# filter the data
+data <- data %>% filter(month == 7)
 
 ## data separation and fitting ------------------------------------------------
+# filter 1970 - 1985 data
+data_old <- data %>% filter(year > 1970 & year < 1985)
 
-
-# !!!!! filter 1970 - 1985 July data !!!!!
-
-
-# !!!!! prepare 1970 - 1985 July data for Stan !!!!!
-
+# prepare 1970 - 1985 data for Stan
+y <- data_old$temperature
+n <- length(y)
+stan_data <- list(y = y,
+                  n = length(y))
 
 # fit
 fit_old <- sampling(model, data = stan_data,
@@ -33,12 +36,14 @@ print(fit_old)
 # extract
 extract_old <- extract(fit_old)
 
+# filter 2000+ data
+data_recent <- data %>% filter(year >= 2000)
 
-# !!!!! filter 2000+ July data !!!!!
-
-
-# !!!!! prepare 2000+ July data for Stan !!!!!
-
+# prepare 2000+ data for Stan
+y <- data_recent$temperature
+n <- length(y)
+stan_data <- list(y = y,
+                  n = length(y))
 
 # fit
 fit_recent <- sampling(model, data = stan_data,
@@ -63,15 +68,15 @@ ggplot(data=df_results, aes(x=mu, fill=group)) +
   scale_fill_brewer(type="qual") +
   xlab("success rate")
 
+# probability that 1970-1985 temperature is lower
+mcse(extract_old$mu < extract_recent$mu)
 
-# !!!!! probability that 1970-1985 temperature is lower !!!!!
+# difference in temperature
+difference <- extract_recent$mu - extract_old$mu
+mcse(difference)
 
-
-# !!!!! difference in temperature !!!!!
-difference <- #!!!!!
-
-# !!!!! 95% CI for temperature difference !!!!!
-
+# 95% CI
+quantile(difference, probs = c(0.025, 0.975))
 
 # histogram
 # create a data frame

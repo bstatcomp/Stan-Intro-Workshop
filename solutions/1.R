@@ -14,11 +14,13 @@ model <- stan_model("bernoulli.stan")
 
 
 ## default rim, player1 -------------------------------------------------------
-# !!!!! filter the data !!!!!
+# filter the data
+default_rim1 <- data %>% filter(SpecialRim == 0 & PlayerID == 1)
 
-
-# !!!!! prepare data for Stan, store it in the stan_data variable !!!!!
-
+# prepare data for Stan
+y <- default_rim1$Made
+stan_data <- list(y = y,
+                  n = length(y))
 
 # fit
 fit_default1 <- sampling(model, data = stan_data,
@@ -37,11 +39,13 @@ mcse(theta_default1 > 0.5)
 
 
 ## default rim, player1 -------------------------------------------------------
-# !!!!! filter the data !!!!!
+# filter the data
+default_rim2 <- data %>% filter(SpecialRim == 0 & PlayerID == 2)
 
-
-# !!!!! prepare data for Stan, store it in the stan_data variable !!!!!
-
+# prepare data for Stan
+y <- default_rim2$Made
+stan_data <- list(y = y,
+                  n = length(y))
 
 # fit
 fit_default2 <- sampling(model, data = stan_data,
@@ -53,11 +57,13 @@ theta_default2 <- extract_default2$theta
 
 
 ## smaller rim, player1 -------------------------------------------------------
-# !!!!! filter the data !!!!!
+# filter the data
+smaller_rim1 <- data %>% filter(SpecialRim == 1& PlayerID == 1)
 
-
-# !!!!! prepare data for Stan, store it in the stan_data variable !!!!!
-
+# prepare data for Stan
+y <- smaller_rim1$Made
+stan_data <- list(y = y,
+                  n = length(y))
 
 # fit
 fit_smaller1 <- sampling(model, data = stan_data,
@@ -121,7 +127,7 @@ mcse(theta_default1 > theta_smaller1)
 mcse(theta_default1 - theta_smaller1)
 
 # 95% CI
-quantile(theta_default1 - theta_smaller1, probs = c(0.025, 0.975))
+quantile(theta_default1 - theta_smaller1, probs = c(0.05, 1))
 
 # histogram
 # create a data frame

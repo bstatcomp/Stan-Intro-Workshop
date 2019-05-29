@@ -1,28 +1,26 @@
 ---
 title: "Izjemno kratek uvod v R"
-date: "31/5/2019"
-author: "Jure Demsar"
-output:
-  prettydoc::html_pretty:
-    theme: architect
-    toc: yes
-    highlight: github
+date: "30/5/2019"
+author: "Jure Demšar"
+output: pdf_document
 ---
 
 
 # R in RStudio
 
-R (https://www.r-project.org/) is odprto kodni programski jezik namenjen primarno statisičnim izračunom. Osnovni vmesnik za delo z Rjem je precej okoren, zato si delo lahko precej olajšamo z namestitvijo drugega razvojnega okolja. Najbolj razširjeno ter razmeroma kvalitetno razvojno okolje se imenuje RStudio (https://www.rstudio.com).
+R (https://www.r-project.org/) je odprto kodni programski jezik namenjen primarno statisičnim izračunom. Osnovni vmesnik za delo z Rjem je precej okoren, zato si delo lahko precej olajšamo z namestitvijo drugega razvojnega okolja. Najbolj razširjeno ter razmeroma kvalitetno razvojno okolje se imenuje RStudio (https://www.rstudio.com).
+
 
 # Paketi
 
-Ker je R odprto kodni programski jezik lahko vsak prispeva k njegovem razvoju s pomočjo dodatnih paketov. Uporaba paketov nam močno olajša delo, večina uporabnih paketov se nahaja v repozitoriju CRAN. V RStudiu lahko pakete iz repozitorija CRAN naložimo preko menuja Tools in izbire Install Packages. Če poznamo ime paketa, ki ga želimo namestiti lahko to naredimo tudi nreposredno preko ukazne vrstice, ukaz `install.packages("dplyr")` namesti paket dplyr. Ko paket namestimo, ga moramo pred uporabno še uvoziti v našo skripto, to storimo s pomočjo ukaza `library()`. Spodnja koda namesti ter uvozi vse pakete, ki jih bomo potrebovali pri reševanju današnjih nalog.
+Ker je R odprto kodni programski jezik lahko vsak prispeva k njegovem razvoju s pomočjo dodatnih paketov. Uporaba paketov nam močno olajša delo, večina uporabnih paketov se nahaja v repozitoriju CRAN. V RStudiu lahko pakete iz repozitorija CRAN naložimo preko menuja Tools in izbire Install Packages. Če poznamo ime paketa, ki ga želimo namestiti, lahko to naredimo tudi neposredno preko ukazne vrstice, na primer ukaz `install.packages("dplyr")` namesti paket dplyr. Ko paket namestimo, ga moramo pred uporabo še uvoziti v našo skripto, to storimo s pomočjo ukaza `library()`. Spodnja koda namesti ter uvozi vse pakete, ki jih bomo potrebovali pri reševanju današnjih nalog.
 
-```{r eval = FALSE}
+```{r eval=FALSE}
 # install packages
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("mcmcse")
+install.packages("reshape2")
 install.packages("rstan")
 
 # load packages into workspace
@@ -30,27 +28,32 @@ library(dplyr)
 library(ggplot2)
 library(mcmcse)
 library(rstan)
+library(reshape2)
 
+```
+
+```{r include=FALSE}
+library(dplyr)
+library(reshape2)
 ```
 
 # Nalaganje podatkov
 
-Podatki so običajno shranjeni v obliki .csv (angl. *comma separated value*) datotek. Vsaka vrstica v datoteki predstavlja eno meritev, v vsaki vrstici lahko najdemo več atributov te meritve, atributi so ločeni s posebnim znakom, ki v vrednostih atributov ne nastopa. V R podatke iz datoteke csv naložimo s pomočjo ukaza `read.csv()`. Privzeti znak za ločevanje atributov je vejica, zaradi praktičnih razlogov (zmeda z decimalno vejico/piko, nastopanje vejice v tekstovnih podatkih) se vejica običajno ne uporablja. Delilni znak (angl. *separator*) lahko nastavimo z uporabo parametra `par`. Spodnja koda v spremenljivko `basket_data` naloži podatke iz datoteke `basketball_shots.csv`, ki se nahaja v direktoriju `data`.
+Podatki so običajno shranjeni v obliki .csv (angl. *comma separated value*) datotek. Vsaka vrstica v datoteki predstavlja eno meritev, v vsaki vrstici lahko najdemo več atributov te meritve, atributi so ločeni s posebnim znakom, ki v vrednostih atributov ne nastopa. V R podatke iz datoteke csv naložimo s pomočjo ukaza `read.csv()`. Privzeti znak za ločevanje atributov je vejica, zaradi praktičnih razlogov (zmeda z decimalno vejico/piko, vejice v tekstovnih podatkih) se vejica običajno ne uporablja. Delilni znak (angl. *separator*) lahko nastavimo z uporabo parametra `par`. Spodnja koda v spremenljivko `basket_data` naloži podatke iz datoteke `basketball_shots.csv`, ki se nahaja v direktoriju `data`.
 
-```{r eval = FALSE}
+```{r}
 # load data
 basket_data <- read.csv("../data/basketball_shots.csv", sep=";")
 ```
 
-Podatki se naložijo v tako imenovam podatkovni okvir (angl. *data frame*), ta podatkovni tip si lahko predstavljate kot tabelo, kjer stolpci predstavljajo atribute, vrstice pa primerke/meritve. Tako se v posameznih celicah nahajajo vrednosti atributa za določen primerek.
+Podatki se naložijo v podatkovno struktoru imenovano podatkovni okvir (angl. *data frame*), ta podatkovni tip si lahko predstavljate kot tabelo, kjer stolpci predstavljajo atribute, vrstice pa primerke/meritve, v posameznih celicah se tako nahajajo vrednosti atributa za določen primerek.
 
 
-# Manipulacije nad podatki
+# Osnovne operacije nad podatki
 
-Za potrebe delavnice bomo spoznali zgolj najbolj osnovne operacije za delo s podatki. Urejanje podatkov si bomo olajšali z uporabo knjižnice `dplyr`. V naših podatkih o metih na koš nastopa več igralcev, vsak izmed njih je 60 krat vrgel na obilčajen koš ter 60 krat na koš z manjšim obsegom obroča. Spodnji primer prikazuje, kako iz vseh podatkov izluščimo samo podatke o metih prvega igralca na običajen obroč.
+Za potrebe delavnice bomo spoznali zgolj najbolj osnovne operacije za delo s podatki. Urejanje podatkov si bomo olajšali z uporabo knjižnice `dplyr`. V naših podatkih o metih na koš nastopa več igralcev, vsak izmed njih je 60 krat vrgel na običajen koš ter 60 krat na koš z manjšim obsegom obroča. Spodnji primer prikazuje, kako iz vseh podatkov izluščimo samo podatke o metih prvega igralca (atribut `PlayerID` je enak 1) na običajen obroč (atribut `SpecialRim` je enak 0).
 
-```{r eval = FALSE}
-# load data
+```{r}
 player1_data <- filter(basket_data, PlayerID == 1 & SpecialRim == 0)
 ```
 
@@ -61,17 +64,40 @@ Za vsak met imamo 5 podatkov:
 * uspešnost (*Made*),
 * tip obroča (*SpecialRim*).
 
-Recimo, da za nadaljno analizo potrebujemo zgolj stolpca s podatki o zaporedni številki meta ter o uspešnosti meta, ostalih stolpec se lahko znebimo z uporabo operacije `select`.
+Recimo, da za nadaljno analizo potrebujemo zgolj stolpca s podatki o zaporedni številki meta ter o uspešnosti meta, ostalih stolpcev se lahko znebimo z uporabo operacije `select`. Reduciranje števila stolpcev je še posebaj koristno, če operiramo z ogromnimi količinami podatkov.
 
-```{r eval = FALSE}
-# load data
+```{r}
 player1_data <- select(player1_data, ThrowNum, Made)
 ```
 
+Operacijo `melt` iz paketa `reshape2` bomo uporabljali predsem za pripravo podatkov pred vizualizacijami. Spodnji primer prikaže uporabo melt, ko želimo primerjati zneske, ki so jih zagonska podjetja vložila v raziskave in razvoj, marketing in administracijo.
 
-rehshape2 melt
+```{r echo=FALSE, include=FALSE}
+investments <- data.frame(research=c(165349.2, 162597.7, 153441.51), marketing=c(471784.1, 443898.53, 407934.54), administration=c(136897.8, 151377.59, 101145.55))
+```
+
+```{r echo=FALSE}
+investments
+```
+
+Osnovna uporaba ukaza `melt` nam podatke zreducira na 2 stolpca, poimenovana `variable` in `value`, pri čimer vsaka vrstica predstavlja eno celico (par `variable`/`value`) iz izhodiščnega podatkovnega okvirja. Tako pripravljene podatke lahko nato v vizualizacijah grupiramo po vrednosti atributa `variable`, medtem ko vrednosti (`value`) preslikamo na želeno os grafa.
+
+```{r message=FALSE}
+melt_investments <- melt(investments)
+```
+
+```{r echo=FALSE}
+melt_investments
+```
 
 
+# Cev (angl. *pipe*)
 
-# Cev (angl. pipe)
+V kodi boste srečali tudi cev (`pipe` operator, `%>%`), s pomočjo tega operatorja lahko kodo precej skrajšamo. Operator nam omogoča, da podatke, ki so rezultat ene operacije, prenesemo neposredno v naslednjo operacijo (kot bi naredili cev med dvema operacijama, po cevi se rezultat prve operacije prenese na vhod druge operacije). Spodnji primer prikazuje, kako lahko združimo filtriranje in selektiranje podatkov iz zgornjega primera.
+
+```{r eval=FALSE}
+player1_data <- basket_data %>%
+  filter(PlayerID == 1 & SpecialRim == 0) %>%
+  select(player1_data, ThrowNum, Made)
+```
 

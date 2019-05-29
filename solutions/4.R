@@ -7,9 +7,11 @@ library(reshape2)
 
 
 ## preparation ----------------------------------------------------------------
-# !!!!! load the data !!!!!
+# load data
+data <- read.csv("../data/50_startups.csv")
 
-# !!!!! compile the model !!!!!
+# compile the model
+model <- stan_model("multiple_linear.stan")
 
 
 ## expand the categorical variable -------------------------------------------
@@ -23,7 +25,16 @@ data <- data %>%
 #data <- cbind(data, states_prep)
 
 ## fit ------------------------------------------------------------------------
-# !!!!! prepare  data for Stan !!!!!
+# prepare data for Stan
+n <- nrow(data)
+X <- data %>%
+  select(research, administration, marketing, stateNewYork, stateFlorida, stateCalifornia)
+k <- ncol(X)
+y <- data$profit
+stan_data <- list(n = n,
+                  k = k,
+                  X = X,
+                  y = y)
 
 # fit 
 fit <- sampling(model, data = stan_data,
@@ -52,9 +63,21 @@ ggplot(data=df_location, aes(x=value, fill=variable)) +
   xlab("")
 
 
-# !!!!! which state is the best, how confident are we in that finding !!!!!
+# florida vs ny
+florida_ny <- df_betas$stateFlorida - df_betas$stateNewYork
+mcse(florida_ny)
+quantile(florida_ny, probs = c(0.025, 0.975))
 
-# !!!!! how much more is the company expected to earn by selecting the best state !!!!!
+# probability that we actualy are making the right call
+mcse(florida_ny > 0)
+
+# florida vs cali
+florida_cali <- df_betas$stateFlorida - df_betas$stateCalifornia
+mcse(florida_cali)
+quantile(florida_cali, probs = c(0.025, 0.975))
+
+# probability that we actualy are making the right call
+mcse(florida_cali > 0)
 
 
 ## how should we invest our money ---------------------------------------------
@@ -68,4 +91,17 @@ ggplot(data=df_investment, aes(x=value, fill=variable)) +
   scale_fill_hue() +
   xlab("")
 
-# !!!!! how should the company invest their money !!!!!
+# profitability of research vs marketing
+research_marketing <- df_betas$research - df_betas$marketing
+mcse(research_marketing)
+quantile(research_marketing, probs = c(0.025, 0.975))
+
+# profitability of research vs marketing
+research_administration <- df_betas$research - df_betas$administration
+mcse(research_administration)
+quantile(research_administration, probs = c(0.025, 0.975))
+
+# how should we distribute our money?
+sum(df_betas$research) / sum(df_investment$value)
+sum(df_betas$marketing) / sum(df_investment$value)
+sum(df_betas$administration) / sum(df_investment$value)
