@@ -8,7 +8,7 @@ library(reshape2)
 
 ## preparation ----------------------------------------------------------------
 # load data
-data <- read.csv("data/elections.csv", sep=";")
+data <- read.csv("../data/elections.csv", sep=";")
 
 # compile the model
 model <- stan_model("elections.stan")

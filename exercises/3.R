@@ -7,7 +7,7 @@ library(mcmcse)
 
 ## preparation ----------------------------------------------------------------
 # load data
-data <- read.csv("data/temperature.csv", sep=";")
+data <- read.csv("../data/temperature.csv", sep=";")
 
 # compile the model
 model <- stan_model("linear.stan")

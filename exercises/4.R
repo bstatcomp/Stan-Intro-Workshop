@@ -8,7 +8,7 @@ library(reshape2)
 
 ## preparation ----------------------------------------------------------------
 # load data
-data <- read.csv("data/50_startups.csv")
+data <- read.csv("../data/50_startups.csv")
 
 # compile the model
 model <- stan_model("multiple_linear.stan")
