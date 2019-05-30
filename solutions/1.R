@@ -34,7 +34,7 @@ print(fit_default1)
 extract_default1 <- extract(fit_default1)
 theta_default1 <- extract_default1$theta
 
-# probability that the player hits more than 60% of shots
+# probability that player 1 hits more than 50% of shots
 mcse(theta_default1 > 0.5)
 
 
@@ -55,6 +55,9 @@ fit_default2 <- sampling(model, data = stan_data,
 extract_default2 <- extract(fit_default2)
 theta_default2 <- extract_default2$theta
 
+# probability that player 2 hits more than 50% of shots
+mcse(theta_default2 > 0.5)
+
 
 ## smaller rim, player1 -------------------------------------------------------
 # filter the data
@@ -73,7 +76,7 @@ fit_smaller1 <- sampling(model, data = stan_data,
 extract_smaller1 <- extract(fit_smaller1)
 theta_smaller1 <- extract_smaller1$theta
 
-# probability that the player hits more than 50% of shots
+# probability that player 1 hits more than 50% of shots on a smaller rim
 mcse(theta_smaller1 > 0.5)
 
 

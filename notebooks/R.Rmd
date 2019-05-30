@@ -13,7 +13,7 @@ R (https://www.r-project.org/) je odprto kodni programski jezik namenjen primarn
 
 # Paketi
 
-Ker je R odprto kodni programski jezik lahko vsak prispeva k njegovem razvoju s pomočjo dodatnih paketov. Uporaba paketov nam močno olajša delo, večina uporabnih paketov se nahaja v repozitoriju CRAN. V RStudiu lahko pakete iz repozitorija CRAN naložimo preko menuja Tools in izbire Install Packages. Če poznamo ime paketa, ki ga želimo namestiti, lahko to naredimo tudi neposredno preko ukazne vrstice, na primer ukaz `install.packages("dplyr")` namesti paket dplyr. Ko paket namestimo, ga moramo pred uporabo še uvoziti v našo skripto, to storimo s pomočjo ukaza `library()`. Spodnja koda namesti ter uvozi vse pakete, ki jih bomo potrebovali pri reševanju današnjih nalog.
+Ker je R odprto kodni programski jezik, lahko vsak prispeva k njegovem razvoju s pomočjo dodatnih paketov. Uporaba paketov nam močno olajša delo, večina uporabnih paketov se nahaja v repozitoriju CRAN. V RStudiu lahko pakete iz repozitorija CRAN naložimo preko menuja Tools in izbire Install Packages. Če poznamo ime paketa, ki ga želimo namestiti, lahko to naredimo tudi neposredno preko ukazne vrstice, na primer ukaz `install.packages("dplyr")` namesti paket dplyr. Ko paket namestimo, ga moramo pred uporabo še uvoziti v našo skripto, to storimo s pomočjo ukaza `library()`. Spodnja koda namesti ter uvozi vse pakete, ki jih bomo potrebovali pri reševanju današnjih nalog.
 
 ```{r eval=FALSE}
 # install packages
@@ -46,8 +46,57 @@ Podatki so običajno shranjeni v obliki .csv (angl. *comma separated value*) dat
 basket_data <- read.csv("../data/basketball_shots.csv", sep=";")
 ```
 
-Podatki se naložijo v podatkovno struktoru imenovano podatkovni okvir (angl. *data frame*), ta podatkovni tip si lahko predstavljate kot tabelo, kjer stolpci predstavljajo atribute, vrstice pa primerke/meritve, v posameznih celicah se tako nahajajo vrednosti atributa za določen primerek.
+Podatki se naložijo v podatkovno strukturo imenovano podatkovni okvir (angl. *data frame*). Ta podatkovni tip si lahko predstavljate kot tabelo, kjer stolpci predstavljajo atribute, vrstice pa kot primerke/meritve. V posameznih celicah se tako nahajajo vrednosti atributa za določen primerek.
 
+S pomočjo konstruktorja `data.frame()` lahko naredimo tudi nov podatkovni okvir, operacija `c()` v spodnjem primeru predstavlja *combine* in združi več posameznih elementov v vektor.
+
+```{r}
+# we can create new data frames like this, c() combines elements into a vector
+new_df <- data.frame(first_column=c(1, 2), second_column=c(10, 11))
+```
+
+```{r echo=FALSE}
+new_df
+```
+
+Do posameznih stolpcev podatkovnega okvirja dostopamo z znakom \$, do števila vrstic v okvirju pa pridemo z ukazom `nrow()`.
+
+```{r}
+# to access columns of a data frame use the $ sign
+new_df$first_column
+
+# to get number of rows in a data frame use nrow
+nrow(new_df)
+```
+
+Z ukazom `rbind()` lahko združimo več podatkovnih okvirjev v enega, pogoj je, da se okvirji ujemajo v vseh stolpcih.
+
+```{r}
+# create another data frame
+new_df2 <- data.frame(first_column=c(3, 4), second_column=c(12, 13))
+
+# we can merge data frames together (if they have same columns) using rbind
+new_df3 <- rbind(new_df, new_df2)
+```
+
+Pri pripravi podatkov za Stan moramo običajno iz podatkovnega okvirja izluščiti samo določen stolpec. Ko stolpec shranimo v spremenljivko, dobimo spremenljivko tipa vektor. Za izračun dolžine vektorja ne uporabljamo ukaza `nrow()`, saj vektor nima vrstic, ampak uporabimo ukaz `length()`.
+
+```{r}
+# we can extract a column and save it into a vector
+first_column <- new_df$first_column
+
+# to get length of a vector use the length function
+length(first_column)
+```
+
+Ko pripravljamo podatke za Stan, jih shranimo v podatkovno struktoro `list`. Gre za seznam spremenljivk različnega tipa, v spodnjem primeru tako naredimo seznam, ki vsebuje celo število (`n`) ter vektor realnih števil (`y`).
+
+```{r}
+# we pass data to stan through lists
+n <- nrow(new_df)
+y <- new_df$first_column
+stan_data <- list(n = n, y = y)
+```
 
 # Osnovne operacije nad podatki
 
@@ -64,7 +113,7 @@ Za vsak met imamo 5 podatkov:
 * uspešnost (*Made*),
 * tip obroča (*SpecialRim*).
 
-Recimo, da za nadaljno analizo potrebujemo zgolj stolpca s podatki o zaporedni številki meta ter o uspešnosti meta, ostalih stolpcev se lahko znebimo z uporabo operacije `select`. Reduciranje števila stolpcev je še posebaj koristno, če operiramo z ogromnimi količinami podatkov.
+Recimo, da za nadaljno analizo potrebujemo zgolj stolpca s podatki o zaporedni številki meta ter o uspešnosti meta, ostalih stolpcev se lahko znebimo z uporabo operacije `select`. Reduciranje števila stolpcev je še posebej koristno, če operiramo z ogromnimi količinami podatkov.
 
 ```{r}
 player1_data <- select(player1_data, ThrowNum, Made)
@@ -80,7 +129,7 @@ investments <- data.frame(research=c(165349.2, 162597.7, 153441.51), marketing=c
 investments
 ```
 
-Osnovna uporaba ukaza `melt` nam podatke zreducira na 2 stolpca, poimenovana `variable` in `value`, pri čimer vsaka vrstica predstavlja eno celico (par `variable`/`value`) iz izhodiščnega podatkovnega okvirja. Tako pripravljene podatke lahko nato v vizualizacijah grupiramo po vrednosti atributa `variable`, medtem ko vrednosti (`value`) preslikamo na želeno os grafa.
+Osnovna uporaba ukaza `melt` nam podatke zreducira na 2 stolpca, poimenovana `variable` in `value`, kjer vsaka vrstica predstavlja eno celico (par `variable`/`value`) iz izhodiščnega podatkovnega okvirja. Tako pripravljene podatke lahko nato v vizualizacijah grupiramo po vrednosti atributa `variable`, medtem ko vrednosti (`value`) preslikamo na želeno os grafa.
 
 ```{r message=FALSE}
 melt_investments <- melt(investments)

@@ -78,6 +78,7 @@ mcse(difference)
 # 95% CI
 quantile(difference, probs = c(0.025, 0.975))
 
+
 # histogram
 # create a data frame
 df_difference <- data.frame(difference=difference)

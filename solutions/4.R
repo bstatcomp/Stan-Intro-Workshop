@@ -68,7 +68,7 @@ florida_ny <- df_betas$stateFlorida - df_betas$stateNewYork
 mcse(florida_ny)
 quantile(florida_ny, probs = c(0.025, 0.975))
 
-# probability that we actualy are making the right call
+# probability that we are making the right call
 mcse(florida_ny > 0)
 
 # florida vs cali
@@ -76,7 +76,7 @@ florida_cali <- df_betas$stateFlorida - df_betas$stateCalifornia
 mcse(florida_cali)
 quantile(florida_cali, probs = c(0.025, 0.975))
 
-# probability that we actualy are making the right call
+# probability that we are making the right call
 mcse(florida_cali > 0)
 
 
