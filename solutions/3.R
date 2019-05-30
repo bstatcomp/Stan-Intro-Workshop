@@ -140,7 +140,7 @@ mcse(t_2019 > 20)
 ## predict Slovenian temperature in 2070 --------------------------------------------
 # generate 100000 samples for year 2070 based on mean parameter values
 # rnorm generates random samples from the normal distribution
-t_2070 = rnorm(100000, mean = a + (2060 - min_year) * b, sd = sigma)
+t_2070 = rnorm(100000, mean = a + (2070 - min_year) * b, sd = sigma)
 
 # mean and error
 mcse(t_2070)
@@ -148,5 +148,5 @@ mcse(t_2070)
 # 95% CI
 quantile(t_2070, probs = c(0.025, 0.975))
 
-# probability that T is over 25
+# probability that T is over 20
 mcse(t_2070 > 20)

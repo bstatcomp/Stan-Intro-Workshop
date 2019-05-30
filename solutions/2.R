@@ -59,8 +59,8 @@ extract_recent <- extract(fit_recent)
 
 ## analysis -------------------------------------------------------------------
 # join all data in a data frame
-df_results <- data.frame(mu=extract_old$mu, group="1970-2010")
-df_results <- rbind(df_results, data.frame(mu=extract_recent$mu, group="2010+"))
+df_results <- data.frame(mu=extract_old$mu, group="1970-1985")
+df_results <- rbind(df_results, data.frame(mu=extract_recent$mu, group="2000+"))
 
 # plot theta density
 ggplot(data=df_results, aes(x=mu, fill=group)) +

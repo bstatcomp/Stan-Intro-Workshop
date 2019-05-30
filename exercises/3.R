@@ -116,7 +116,7 @@ t_2019 = rnorm(100000, mean = a + (2019 - min_year) * b, sd = sigma)
 ## predict Slovenian temperature in 2070 --------------------------------------------
 # generate 100000 samples for year 2070 based on mean parameter values
 # rnorm generates random samples from the normal distribution
-t_2070 = rnorm(100000, mean = a + (2060 - min_year) * b, sd = sigma)
+t_2070 = rnorm(100000, mean = a + (2070 - min_year) * b, sd = sigma)
 
 # !!!!! calculate mean and 95% CI of the predicted 2070 temperature !!!!!
 
